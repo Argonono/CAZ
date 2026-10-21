@@ -1,0 +1,6 @@
+streamlit>=1.50,<2
+requests>=2.31
+folium>=0.15
+streamlit-folium>=0.16
+tzdata>=2024.1
+timezonefinder>=6.5

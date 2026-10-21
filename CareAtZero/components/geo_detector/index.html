@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="margin:0">
+<script>
+/*
+  CareAtZero location detector (a tiny Streamlit component, no outside libraries).
+
+  Finds the user's approximate location in their own browser and sends it back to
+  the app in the SAME session (no page reloads):
+    1. Phone/computer location (GPS / Wi-Fi), if the user allows it  -> lat/lon
+    2. Otherwise their internet connection's location (ipinfo.io, then ipapi.co,
+       then freeipapi.com)                                           -> ZIP, city, lat/lon
+    3. Otherwise {source: "none"}, and the app asks "Enter your ZIP code".
+  The app turns GPS coordinates into a ZIP code itself, offline, from the
+  U.S. Census ZIP list. Nothing is stored.
+*/
+function send(type, extra) {
+  window.parent.postMessage(Object.assign({isStreamlitMessage: true, type: type}, extra || {}), "*");
+}
+function reply(value) {
+  send("streamlit:setComponentValue", {value: value, dataType: "json"});
+}
+async function getJSON(url) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 4000);
+  try {
+    const r = await fetch(url, {cache: "no-store", signal: ctrl.signal});
+    return r.ok ? await r.json() : null;
+  } catch (e) {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+function gps() {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) return resolve(null);
+    navigator.geolocation.getCurrentPosition(
+      (p) => resolve({lat: p.coords.latitude, lon: p.coords.longitude, source: "browser_gps"}),
+      () => resolve(null),
+      {timeout: 6000, maximumAge: 600000, enableHighAccuracy: false}
+    );
+  });
+}
+async function byInternetAddress() {
+  let d = await getJSON("https://ipinfo.io/json");
+  if (d && d.postal) {
+    const ll = (d.loc || "").split(",");
+    return {zip: d.postal, city: d.city || "", region: d.region || "",
+            lat: ll.length === 2 ? +ll[0] : null, lon: ll.length === 2 ? +ll[1] : null, source: "browser_ip"};
+  }
+  d = await getJSON("https://ipapi.co/json/");
+  if (d && d.postal) {
+    return {zip: d.postal, city: d.city || "", region: d.region_code || "",
+            lat: d.latitude, lon: d.longitude, source: "browser_ip"};
+  }
+  d = await getJSON("https://freeipapi.com/api/json");
+  if (d && d.zipCode) {
+    return {zip: d.zipCode, city: d.cityName || "", region: d.regionName || "",
+            lat: d.latitude, lon: d.longitude, source: "browser_ip"};
+  }
+  return null;
+}
+let started = false;
+window.addEventListener("message", async (event) => {
+  if (!event.data || event.data.type !== "streamlit:render" || started) return;
+  started = true;
+  send("streamlit:setFrameHeight", {height: 0});
+  const found = (await gps()) || (await byInternetAddress()) || {source: "none"};
+  reply(found);
+});
+send("streamlit:componentReady", {apiVersion: 1});
+</script>
+</body>
+</html>

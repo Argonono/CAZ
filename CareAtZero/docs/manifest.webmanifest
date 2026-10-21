@@ -1,0 +1,18 @@
+{
+  "id": "./",
+  "name": "CareAtZero",
+  "short_name": "CareAtZero",
+  "description": "Free and low-cost medical, dental and mental health care near you. Know where to go.",
+  "start_url": "./?source=home-screen",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFFFFF",
+  "theme_color": "#0A7C74",
+  "categories": ["health", "medical"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

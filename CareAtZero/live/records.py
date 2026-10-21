@@ -1,0 +1,77 @@
+"""
+Builds records in the same shape as the app's database rows (see database/db.py),
+so the scoring, Find, Detail, calendar and referral code work unchanged with live data.
+"""
+from typing import List, Optional
+
+
+def make_site(*, id: str, name: str, site_type: str, address: str, city: str, state: str, zip_code: str,
+              latitude: float, longitude: float, phone: str, website: str, services: List[str],
+              cost_class: str, eligibility: str, appointment_rule: str, source_name: str, source_url: str,
+              last_checked: str, documents_required: Optional[List[str]] = None,
+              hours_summary: str = "Call for current hours", uninsured_acceptance: str = "Uninsured patients accepted",
+              notes: str = "") -> dict:
+    return {
+        "id": id,
+        "record_type": "site",
+        "name": name,
+        "type": site_type,
+        "address": address,
+        "city": city,
+        "state": state,
+        "zip_code": zip_code,
+        "latitude": latitude,
+        "longitude": longitude,
+        "phone": phone,
+        "website": website,
+        "services": services,
+        "cost_class": cost_class,
+        "uninsured_acceptance": uninsured_acceptance,
+        "eligibility": eligibility,
+        "documents_required": documents_required or ["Call to confirm what to bring"],
+        "hours_summary": hours_summary,
+        "appointment_rule": appointment_rule,
+        "notes": notes,
+        "source_name": source_name,
+        "source_url": source_url,
+        "last_checked": last_checked,
+        "source_status": "active",
+        "is_live": True,
+    }
+
+
+def make_event(*, id: str, title: str, organizer_name: str, date_start: str, date_end: str, time_details: str,
+               location_name: str, address: str, city: str, state: str, zip_code: str,
+               latitude: Optional[float], longitude: Optional[float], services: List[str], cost_class: str,
+               eligibility: str, appointment_rule: str, documents_required: List[str], phone: str,
+               website: str, source_name: str, source_url: str, last_checked: str, notes: str = "") -> dict:
+    return {
+        "id": id,
+        "record_type": "event",
+        "title": title,
+        "organizer_name": organizer_name,
+        "date_start": date_start,
+        "date_end": date_end,
+        "time_details": time_details,
+        "location_name": location_name,
+        "address": address,
+        "city": city,
+        "state": state,
+        "zip_code": zip_code,
+        "latitude": latitude,
+        "longitude": longitude,
+        "services": services,
+        "cost_class": cost_class,
+        "uninsured_acceptance": "All welcome",
+        "eligibility": eligibility,
+        "appointment_rule": appointment_rule,
+        "documents_required": documents_required,
+        "phone": phone,
+        "website": website,
+        "notes": notes,
+        "source_name": source_name,
+        "source_url": source_url,
+        "last_checked": last_checked,
+        "source_status": "active",
+        "is_live": True,
+    }

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <!--
+    CareAtZero launcher (installable PWA shell).
+    This page gives CareAtZero its own name, icon and full-screen mode when someone
+    taps "Install" / "Add to Home Screen". The app itself still runs on Streamlit
+    Community Cloud and is shown full-screen inside this page.
+    To point at a different Streamlit app, change APP_URL below (one line).
+  -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>CareAtZero</title>
+  <meta name="description" content="Free and low-cost care. Know where to go.">
+  <meta name="theme-color" content="#0A7C74">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <!-- iPhone: open full-screen from the home screen, with the app's own name -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="CareAtZero">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <style>
+    :root { --navy: #0E2A5C; --teal: #0A7C74; --ink-faint: #55637A; --bg: #F4F7FA; }
+    html, body { margin: 0; height: 100%; background: var(--bg); }
+    body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--navy); }
+
+    /* The Streamlit app, full screen */
+    /* Streamlit Community Cloud adds a "Built with Streamlit · Fullscreen" bar under
+       every embedded app. The frame is made this much taller than the screen so
+       that bar sits just below the visible area. If a thin strip of the bar still
+       shows, raise this number a little; if the tab bar looks cut off, lower it. */
+    :root { --cloud-bar: 52px; }
+    html, body { overflow: hidden; }
+    #app {
+      position: fixed; top: 0; left: 0; width: 100%; height: calc(100% + var(--cloud-bar)); border: 0;
+      padding-top: env(safe-area-inset-top); box-sizing: border-box; background: var(--bg);
+    }
+
+    /* Splash shown while the app loads (Streamlit apps can take a while to wake up) */
+    #splash, #offline {
+      position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 14px; padding: 24px; text-align: center; background: #FFFFFF;
+      transition: opacity .35s ease;
+    }
+    #splash img { width: 96px; height: 96px; border-radius: 22px; box-shadow: 0 2px 10px rgba(14,42,92,.15); }
+    .name { font-size: 26px; font-weight: 800; letter-spacing: -0.3px; }
+    .name span { color: var(--teal); }
+    .tag { font-size: 14px; font-weight: 600; color: var(--ink-faint); }
+    .bar { width: 140px; height: 4px; border-radius: 4px; background: #E2E8F0; overflow: hidden; margin-top: 10px; }
+    .bar::after { content: ""; display: block; width: 40%; height: 100%; background: var(--teal);
+                  border-radius: 4px; animation: slide 1.1s ease-in-out infinite; }
+    @keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+    #slow { display: none; max-width: 300px; font-size: 14px; line-height: 1.45; color: var(--ink-faint); margin-top: 8px; }
+    .hidden { opacity: 0; pointer-events: none; }
+
+    /* Offline screen: still shows emergency numbers */
+    #offline { display: none; }
+    #offline h1 { margin: 0; font-size: 22px; }
+    #offline p { margin: 0; max-width: 300px; font-size: 15px; line-height: 1.45; color: var(--ink-faint); }
+    .call { display: block; width: 260px; padding: 14px; border-radius: 14px; color: #FFFFFF;
+            font-size: 17px; font-weight: 800; text-decoration: none; }
+    .retry { margin-top: 6px; padding: 12px 22px; border-radius: 12px; border: 1px solid #CBD5E1;
+             background: #FFFFFF; font-size: 15px; font-weight: 700; color: var(--navy); cursor: pointer; }
+  </style>
+</head>
+<body>
+  <iframe id="app" title="CareAtZero" allow="geolocation; clipboard-write; fullscreen"></iframe>
+
+  <div id="splash" role="status" aria-live="polite">
+    <img src="icons/icon-192.png" alt="">
+    <div class="name">CareAt<span>Zero</span></div>
+    <div class="tag">Free &amp; low-cost care. Know where to go.</div>
+    <div class="bar" aria-hidden="true"></div>
+    <div id="slow">Waking up the app. Free apps sleep when nobody is using them, so the first visit can take up to a minute.</div>
+  </div>
+
+  <div id="offline" role="alert">
+    <h1>You're offline</h1>
+    <p>CareAtZero needs an internet connection to find clinics. Emergency numbers still work:</p>
+    <a class="call" href="tel:911" style="background:#B42318">Call 911</a>
+    <a class="call" href="tel:988" style="background:#0E2A5C">Call or text 988</a>
+    <button class="retry" type="button" onclick="location.reload()">Try again</button>
+  </div>
+
+  <script>
+    // The live Streamlit app. "?embed=true" hides Streamlit's own top bar and footer.
+    const APP_URL = "https://careatzero-mobile.streamlit.app/?embed=true";  // test copy on your account. At hand-over change to https://careatzero.streamlit.app/?embed=true
+
+    const frame = document.getElementById("app");
+    const splash = document.getElementById("splash");
+    const slow = document.getElementById("slow");
+    const offline = document.getElementById("offline");
+
+    function showOffline() { offline.style.display = "flex"; splash.classList.add("hidden"); }
+
+    if (!navigator.onLine) {
+      showOffline();
+    } else {
+      frame.src = APP_URL;
+      frame.addEventListener("load", () => {
+        // Give Streamlit a moment to draw its first screen before removing the splash
+        setTimeout(() => splash.classList.add("hidden"), 900);
+      });
+      setTimeout(() => { slow.style.display = "block"; }, 6000);
+    }
+    window.addEventListener("offline", showOffline);
+    window.addEventListener("online", () => location.reload());
+
+    // The service worker is what makes the page installable and lets it open offline
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => navigator.serviceWorker.register("sw.js"));
+    }
+  </script>
+</body>
+</html>
