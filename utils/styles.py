@@ -195,6 +195,13 @@ def inject_custom_css():
     .cz-help p { margin: 0 0 12px; font-size: 14px; }
     .cz-help a { display: block; text-align: center; text-decoration: none !important; border-radius: 14px;
                  padding: 15px; font-size: 18px; font-weight: 800; color: #FFFFFF !important; }
+        /* remove the focus ring from page containers (keyboard scrolling) */
+    [tabindex="-1"]:focus, [tabindex="-1"]:focus-visible,
+    [tabindex="0"]:not(button):not(input):not(textarea):not(select):not(a):focus,
+    [tabindex="0"]:not(button):not(input):not(textarea):not(select):not(a):focus-visible,
+    [data-testid="stApp"] *:focus:not(button):not(input):not(textarea):not(select):not(a):not([role="button"]):not([role="tab"]):not([role="radio"]):not([role="combobox"]) {
+        outline: none !important; box-shadow: none !important; border-color: transparent;
+    }
     </style>
     """, unsafe_allow_html=True)
 
