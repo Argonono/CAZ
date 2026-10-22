@@ -119,14 +119,17 @@ def inject_custom_css():
     .st-key-cz_nav [data-testid="stIconMaterial"] { font-size: 24px !important; }
 
     /* ---- care-type cards (2x2) ---- */
-    [class*="st-key-svc_"] button {
-        min-height: 78px; justify-content: flex-start !important; text-align: left; border-radius: 14px !important;
+        [class*="st-key-svc_"] button {
+        height: 96px !important; min-height: 96px !important; box-sizing: border-box;
+        justify-content: flex-start !important; align-items: center; text-align: left; border-radius: 14px !important;
         background: #FFFFFF !important; border: 1px solid var(--line) !important; color: var(--ink) !important;
-        padding: 8px 12px !important;
+        padding: 8px 12px !important; box-shadow: none !important;
     }
     [class*="st-key-svc_"] button[data-testid="stBaseButton-primary"] {
-        background: var(--teal-50) !important; border: 2px solid var(--teal) !important;
+        background: var(--teal-50) !important; border: 1px solid var(--teal) !important;
+        box-shadow: inset 0 0 0 1px var(--teal) !important;
     }
+    [class*="st-key-svc_"] > div, [class*="st-key-svc_"] [data-testid="stButton"] { height: 100%; }
     [class*="st-key-svc_"] button p { font-size: 15px !important; font-weight: 700 !important; text-align: left; line-height: 1.25; }
     [class*="st-key-svc_"] [data-testid="stIconMaterial"] { color: var(--teal) !important; font-size: 24px !important; }
 
