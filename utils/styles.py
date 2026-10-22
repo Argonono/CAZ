@@ -111,6 +111,14 @@ def inject_custom_css():
     }
     html::-webkit-scrollbar, body::-webkit-scrollbar, [data-testid="stAppViewContainer"]::-webkit-scrollbar,
     [data-testid="stMain"]::-webkit-scrollbar, section.main::-webkit-scrollbar { display: none !important; width: 0 !important; }
+        /* no focus ring around the page when scrolling with the keyboard */
+    html, body, [data-testid="stApp"], [data-testid="stAppViewContainer"], [data-testid="stMain"],
+    [data-testid="stMainBlockContainer"], section.main, .block-container {
+        outline: none !important; -webkit-focus-ring-color: transparent;
+    }
+    [data-testid="stMain"]:focus, [data-testid="stMain"]:focus-visible,
+    [data-testid="stAppViewContainer"]:focus, [data-testid="stAppViewContainer"]:focus-visible,
+    section.main:focus, section.main:focus-visible { outline: none !important; box-shadow: none !important; }
     .st-key-cz_nav {
         position: fixed; bottom: 0; left: 0; right: 0; margin: 0 auto; transform: none; z-index: 1000;
         width: 100%; max-width: 440px; background: #FFFFFF; border-top: 1px solid var(--line);
