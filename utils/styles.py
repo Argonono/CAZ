@@ -105,8 +105,14 @@ def inject_custom_css():
     .cz-em-blue { background: var(--blue-50); color: #0A3D91 !important; }
 
     /* ---- bottom tab bar ---- */
+    /* hide Streamlit's scrollbar so the page and the tab bar share the same center line */
+    html, body, [data-testid="stApp"], [data-testid="stAppViewContainer"], [data-testid="stMain"], section.main {
+        scrollbar-width: none !important; -ms-overflow-style: none !important;
+    }
+    html::-webkit-scrollbar, body::-webkit-scrollbar, [data-testid="stAppViewContainer"]::-webkit-scrollbar,
+    [data-testid="stMain"]::-webkit-scrollbar, section.main::-webkit-scrollbar { display: none !important; width: 0 !important; }
     .st-key-cz_nav {
-        position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); z-index: 1000;
+        position: fixed; bottom: 0; left: 0; right: 0; margin: 0 auto; transform: none; z-index: 1000;
         width: 100%; max-width: 440px; background: #FFFFFF; border-top: 1px solid var(--line);
         padding: 6px 6px calc(14px + env(safe-area-inset-bottom, 0px)); box-sizing: border-box;
     }
