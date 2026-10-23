@@ -1,0 +1,47 @@
+name: Keep app awake
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"   # every 6 hours (GitHub may start it up to an hour late)
+  workflow_dispatch:           # lets you press "Run workflow" by hand
+
+jobs:
+  keep-awake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      APP_URL: https://careatzero.streamlit.app/
+    steps:
+      - name: Stop after the contest period
+        id: window
+        run: |
+          if [ "$(date -u +%Y%m%d)" -gt 20270131 ]; then
+            echo "Past Jan 31, 2027 - not running."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.window.outputs.skip != 'true'
+
+      - uses: actions/setup-python@v5
+        if: steps.window.outputs.skip != 'true'
+        with:
+          python-version: "3.11"
+
+      - name: Install browser
+        if: steps.window.outputs.skip != 'true'
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+
+      - name: Visit the app
+        if: steps.window.outputs.skip != 'true'
+        run: python tools/keep_awake.py "$APP_URL"
+
+      - name: Save screenshot if it failed
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: keep-awake-screenshot
+          path: keep_awake_failed.png
+          if-no-files-found: ignore
