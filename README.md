@@ -4,9 +4,9 @@
 
 CareAtZero helps people who don't have health insurance find **free or low-cost** doctors, dentists, eye care and mental-health help near them.
 
-Try it: **https://careatzero.streamlit.app**
+Try it: **https://argonono.github.io/CareAtZero/**
 
-Made by Arjun Manne for the 2026 Congressional App Challenge.
+Made by Arjun Manne.
 
 ---
 
